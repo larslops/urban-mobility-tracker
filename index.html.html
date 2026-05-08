@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urban Mobility News Tracker — EIT Urban Mobility</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #f4f1ec;
+    --surface: #faf9f6;
+    --surface2: #edeae3;
+    --border: #d8d3c8;
+    --border-strong: #b8b2a7;
+    --text: #1a1714;
+    --text-muted: #6b6560;
+    --text-faint: #9e9890;
+    --accent: #1a4f3a;
+    --accent-light: #e8f0ec;
+    --accent-text: #1a4f3a;
+    --positive: #2d6a4f;
+    --positive-bg: #d8f0e5;
+    --negative: #8b2020;
+    --negative-bg: #f5dede;
+    --neutral: #7a5c1e;
+    --neutral-bg: #f5edda;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Layout ── */
+  .layout { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand-label {
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+  .brand-title {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .brand-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+
+  input[type="date"] {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+  input[type="date"]:focus { border-color: var(--accent); }
+
+  .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .country-list { display: flex; flex-direction: column; gap: 6px; }
+  .country-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: all .15s;
+    user-select: none;
+  }
+  .country-toggle:hover { border-color: var(--border-strong); color: var(--text); }
+  .country-toggle.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+  .country-toggle .flag { font-size: 16px; }
+  .country-toggle .check {
+    margin-left: auto;
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .country-toggle.active .check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-size: 10px;
+  }
+
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .slider-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+    min-width: 28px;
+    text-align: right;
+  }
+
+  .run-btn {
+    width: 100%;
+    padding: 11px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: opacity .15s, transform .1s;
+    margin-top: auto;
+  }
+  .run-btn:hover { opacity: .88; }
+  .run-btn:active { transform: scale(.98); }
+  .run-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* ── Main ── */
+  .main { padding: 2rem 2rem 3rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  /* ── Empty state ── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 5rem 2rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+  .empty-state i { font-size: 36px; opacity: .4; }
+  .empty-state p { font-size: 14px; max-width: 300px; line-height: 1.6; }
+
+  /* ── Loading ── */
+  .loading-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 5rem 2rem;
+    color: var(--text-muted);
+  }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-msg { font-size: 13px; color: var(--text-muted); }
+
+  /* ── Error ── */
+  .error-bar {
+    display: none;
+    background: var(--negative-bg);
+    border: 1px solid #e8b4b4;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--negative);
+  }
+
+  /* ── Stats ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+  .stat-val { font-size: 26px; font-weight: 300; color: var(--text); font-family: 'DM Mono', monospace; }
+  .stat-val.pos { color: var(--positive); }
+  .stat-val.neg { color: var(--negative); }
+  .stat-val.neu { color: var(--neutral); }
+
+  .sentiment-strip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+  }
+  .strip-label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .strip-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; gap: 2px; }
+  .strip-pos { background: var(--positive); border-radius: 4px 0 0 4px; }
+  .strip-neg { background: var(--negative); }
+  .strip-neu { background: var(--neutral); border-radius: 0 4px 4px 0; }
+  .strip-legend { display: flex; gap: 16px; margin-top: 8px; }
+  .strip-legend span { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ── Tabs ── */
+  .tab-bar {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
+
+  /* ── Filters ── */
+  .filter-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .filter-label-sm { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .08em; margin-right: 4px; }
+  .pill {
+    padding: 4px 11px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pill:hover { border-color: var(--border-strong); color: var(--text); }
+  .pill.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+
+  /* ── Article cards ── */
+  .article-list { display: flex; flex-direction: column; gap: 10px; }
+  .article-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: border-color .15s;
+  }
+  .article-card:hover { border-color: var(--border-strong); }
+
+  .sent-pip { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+  .pip-positive { background: var(--positive); }
+  .pip-negative { background: var(--negative); }
+  .pip-neutral { background: var(--neutral); }
+
+  .article-body { flex: 1; min-width: 0; }
+  .article-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 3px;
+  }
+  .article-title a { color: inherit; text-decoration: none; }
+  .article-title a:hover { text-decoration: underline; }
+  .article-meta { font-size: 12px; color: var(--text-faint); margin-bottom: 6px; font-family: 'DM Mono', monospace; }
+  .article-summary { font-size: 13px; color: var(--text-muted); line-height: 1.55; margin-bottom: 8px; }
+  .article-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .tag-topic { background: var(--accent-light); color: var(--accent-text); border: 1px solid #bdd4c8; }
+  .tag-country { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+  .tag-positive { background: var(--positive-bg); color: var(--positive); }
+  .tag-negative { background: var(--negative-bg); color: var(--negative); }
+  .tag-neutral { background: var(--neutral-bg); color: var(--neutral); }
+
+  /* ── Word cloud ── */
+  .wordcloud-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wc-inner { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; }
+  .wc-word { font-weight: 400; cursor: default; transition: opacity .15s; }
+  .wc-word:hover { opacity: .6; }
+
+  /* ── No results ── */
+  .no-results { padding: 2rem; text-align: center; color: var(--text-faint); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-label">EIT Urban Mobility</span>
+      <span class="brand-title">Urban Mobility<br>News Tracker</span>
+      <span class="brand-sub">Powered by Claude AI + web search</span>
+    </div>
+
+    <div class="form-group">
+      <span class="form-label">Date range</span>
+      <div class="date-row">
+        <input type="date" id="dateFrom">
+        <input type="date" id="dateTo">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <span class="form-label">Countries</span>
+      <div class="country-list" id="countryList">
+        <div class="country-toggle active" data-c="Netherlands">
+          <span class="flag">🇳🇱</span> Netherlands
+          <span class="check"><i class="ti ti-check" style="font-size:10px"></i></span>
+        </div>
+        <div class="country-toggle active" data-c="Belgium">
+          <span class="flag">🇧🇪</span> Belgium
+          <span class="check"><i class="ti ti-check" style="font-size:10px"></i></span>
+        </div>
+        <div class="country-toggle active" data-c="United Kingdom">
+          <span class="flag">🇬🇧</span> United Kingdom
+          <span class="check"><i class="ti ti-check" style="font-size:10px"></i></span>
+        </div>
+        <div class="country-toggle active" data-c="Luxembourg">
+          <span class="flag">🇱🇺</span> Luxembourg
+          <span class="check"><i class="ti ti-check" style="font-size:10px"></i></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <span class="form-label">Max articles per country</span>
+      <div class="slider-row">
+        <input type="range" id="maxArticles" min="3" max="15" value="6" step="1">
+        <span class="slider-val" id="maxOut">6</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <span class="form-label">NewsAPI key</span>
+      <input type="password" id="apiKey" placeholder="your newsapi.org key…" style="width:100%;font-family:'DM Mono',monospace;font-size:12px">
+      <span style="font-size:11px;color:var(--text-faint);margin-top:2px">Free key at <a href="https://newsapi.org/register" target="_blank" style="color:var(--accent)">newsapi.org/register</a> — never stored, only used to fetch articles.</span>
+    </div>
+
+    <button class="run-btn" id="runBtn" onclick="runSearch()">
+      <i class="ti ti-search"></i> Search news
+    </button>
+  </aside>
+
+  <!-- Main -->
+  <main class="main" id="mainArea">
+
+    <div id="emptyState" class="empty-state">
+      <i class="ti ti-news"></i>
+      <p>Select a date range and countries, then click <strong>Search news</strong> to fetch and classify articles.</p>
+    </div>
+
+    <div id="loadingState" class="loading-state">
+      <div class="spinner"></div>
+      <span class="loading-msg" id="loadingMsg">Searching for articles…</span>
+    </div>
+
+    <div id="errorBar" class="error-bar"></div>
+
+    <div id="results" style="display:none; display:flex; flex-direction:column; gap:1.5rem;">
+
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="sentiment-strip" id="sentStrip"></div>
+
+      <div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('articles',this)">
+            <i class="ti ti-list" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Articles
+          </button>
+          <button class="tab-btn" onclick="switchTab('wordcloud',this)">
+            <i class="ti ti-chart-bubble" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Word cloud
+          </button>
+        </div>
+      </div>
+
+      <div id="tabArticles" style="display:flex;flex-direction:column;gap:12px">
+        <div class="filter-row" id="topicFilters"></div>
+        <div class="filter-row" id="sentFilters">
+          <span class="filter-label-sm">Sentiment</span>
+          <button class="pill active" onclick="setSent('all',this)">All</button>
+          <button class="pill" onclick="setSent('positive',this)">🟢 Positive</button>
+          <button class="pill" onclick="setSent('negative',this)">🔴 Negative</button>
+          <button class="pill" onclick="setSent('neutral',this)">🟡 Neutral</button>
+        </div>
+        <div class="article-list" id="articleList"></div>
+      </div>
+
+      <div id="tabWordcloud" style="display:none">
+        <div class="wordcloud-wrap"><div class="wc-inner" id="wcInner"></div></div>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<script>
+const TOPICS = [
+  "CCAM",
+  "Mobility Data Management",
+  "New Mobility Services",
+  "Urban Vehicle Access Regulations (UVAR)",
+  "Parking and Curb Side Management",
+  "Mobility Planning",
+  "Public Space Design",
+  "Urban Logistics",
+  "Electrification of Transport and Alternative Fuels",
+  "Public Transport",
+  "Road Safety and Security",
+  "Health and Mobility"
+];
+
+const TOPIC_GUIDANCE = `
+- CCAM: connected, cooperative, automated, autonomous mobility, self-driving vehicles, vehicle connectivity
+- Mobility Data Management: transport data platforms, MaaS, real-time data, open data, digital twins
+- New Mobility Services: ride-hailing, car-sharing, bike-sharing, e-scooters, micro-mobility, on-demand transport
+- Urban Vehicle Access Regulations (UVAR): low emission zones, LEZ, congestion charging, access restrictions, ZEZ
+- Parking and Curb Side Management: parking policy, kerb space, loading zones, parking fees, smart parking
+- Mobility Planning: urban transport planning, mobility strategies, SUMP, transport masterplans
+- Public Space Design: street design, pedestrianisation, cycle lanes, public realm, walkability
+- Urban Logistics: freight, last-mile delivery, city logistics, cargo bikes, delivery hubs
+- Electrification of Transport and Alternative Fuels: EVs, electric buses, charging infrastructure, hydrogen, e-fuels
+- Public Transport: buses, trams, metro, rail, transit, bus rapid transit
+- Road Safety and Security: accidents, Vision Zero, speed limits, dangerous junctions, fatalities
+- Health and Mobility: air quality, physical activity, active travel, cycling health, noise pollution
+`;
+
+let allArticles = [];
+let topicFilter = 'all';
+let sentFilter = 'all';
+
+// Init dates
+const today = new Date().toISOString().split('T')[0];
+const weekAgo = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];
+document.getElementById('dateFrom').value = weekAgo;
+document.getElementById('dateTo').value = today;
+
+document.getElementById('maxArticles').oninput = function() {
+  document.getElementById('maxOut').textContent = this.value;
+};
+
+document.querySelectorAll('.country-toggle').forEach(el => {
+  el.onclick = () => el.classList.toggle('active');
+});
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tabArticles').style.display = name === 'articles' ? 'flex' : 'none';
+  document.getElementById('tabWordcloud').style.display = name === 'wordcloud' ? 'block' : 'none';
+}
+
+function setTopic(val, el) {
+  topicFilter = val;
+  document.querySelectorAll('#topicFilters .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderArticles();
+}
+
+function setSent(val, el) {
+  sentFilter = val;
+  document.querySelectorAll('#sentFilters .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderArticles();
+}
+
+function renderArticles() {
+  const list = document.getElementById('articleList');
+  const filtered = allArticles.filter(a => {
+    if (topicFilter !== 'all' && a.topic !== topicFilter) return false;
+    if (sentFilter !== 'all' && a.sentiment !== sentFilter) return false;
+    return true;
+  });
+  if (!filtered.length) {
+    list.innerHTML = '<div class="no-results"><i class="ti ti-mood-empty" style="font-size:22px;display:block;margin-bottom:6px"></i>No articles match these filters.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(a => `
+    <div class="article-card">
+      <div class="sent-pip pip-${a.sentiment}" title="${a.sentiment}"></div>
+      <div class="article-body">
+        <div class="article-title"><a href="${a.url||'#'}" target="_blank" rel="noopener">${a.title}</a></div>
+        <div class="article-meta">${a.source} · ${a.date} · ${a.country}</div>
+        <div class="article-summary">${a.summary}</div>
+        <div class="article-tags">
+          <span class="tag tag-topic">${a.topic}</span>
+          <span class="tag tag-country">${a.country}</span>
+          <span class="tag tag-${a.sentiment}">${a.sentiment}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderStats() {
+  const total = allArticles.length;
+  const pos = allArticles.filter(a => a.sentiment === 'positive').length;
+  const neg = allArticles.filter(a => a.sentiment === 'negative').length;
+  const neu = allArticles.filter(a => a.sentiment === 'neutral').length;
+  const pw = Math.round(pos/total*100);
+  const nw = Math.round(neg/total*100);
+  const nuw = 100 - pw - nw;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-val">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">Positive</div><div class="stat-val pos">${pos}</div></div>
+    <div class="stat-card"><div class="stat-label">Negative</div><div class="stat-val neg">${neg}</div></div>
+    <div class="stat-card"><div class="stat-label">Neutral</div><div class="stat-val neu">${neu}</div></div>
+  `;
+  document.getElementById('sentStrip').innerHTML = `
+    <div class="strip-label">Sentiment overview</div>
+    <div class="strip-bar">
+      <div class="strip-pos" style="width:${pw}%"></div>
+      <div class="strip-neg" style="width:${nw}%"></div>
+      <div class="strip-neu" style="width:${nuw}%"></div>
+    </div>
+    <div class="strip-legend">
+      <span><span class="leg-dot" style="background:var(--positive)"></span>Positive ${pw}%</span>
+      <span><span class="leg-dot" style="background:var(--negative)"></span>Negative ${nw}%</span>
+      <span><span class="leg-dot" style="background:var(--neutral)"></span>Neutral ${nuw}%</span>
+    </div>
+  `;
+}
+
+function renderTopicFilters() {
+  const used = [...new Set(allArticles.map(a => a.topic))].sort();
+  const cont = document.getElementById('topicFilters');
+  cont.innerHTML = '<span class="filter-label-sm">Topic</span>';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'pill active';
+  allBtn.textContent = 'All';
+  allBtn.onclick = () => setTopic('all', allBtn);
+  cont.appendChild(allBtn);
+  used.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'pill';
+    b.textContent = t;
+    b.onclick = () => setTopic(t, b);
+    cont.appendChild(b);
+  });
+}
+
+function renderWordCloud() {
+  const text = allArticles.map(a => a.title + ' ' + a.summary).join(' ');
+  const stop = new Set(['the','a','an','in','on','at','to','for','of','and','or','is','are','was','were','with','that','this','it','its','by','from','as','be','has','have','had','not','but','they','their','been','will','would','could','also','said','after','new','more','than','when','about','up','which','what','how','all','so','he','she','we','you','your','our','his','her','over','into','under','between','through','during','per','does','do','did','can','may','might','should','who','these','those','such','other','then','there','here','just','like','even','only','first','last','one','two','three','some','any','each','both','few','much','many','most','van','de','het','den','een','op','te','met','voor','bij','uit','aan','wordt','naar','door','zijn','heeft','worden','kan','city','urban','mobility','transport','article','new']);
+  const freq = {};
+  text.toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).forEach(w => {
+    if (w.length > 3 && !stop.has(w)) freq[w] = (freq[w]||0)+1;
+  });
+  const sorted = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,50);
+  const max = sorted[0]?.[1]||1;
+  const palette = ['#1a4f3a','#2d6a4f','#52b788','#8b2020','#c1440e','#7a5c1e','#b07d2a','#185fa5','#4a9bd4','#6b6560'];
+  document.getElementById('wcInner').innerHTML = sorted.map(([w,c]) => {
+    const size = Math.round(13 + (c/max)*32);
+    const col = palette[Math.floor(Math.random()*palette.length)];
+    return `<span class="wc-word" style="font-size:${size}px;color:${col};font-weight:${c/max>.6?500:400}" title="${c} mention${c>1?'s':''}">${w}</span>`;
+  }).join('');
+}
+
+function showLoading(v) {
+  document.getElementById('loadingState').style.display = v ? 'flex' : 'none';
+  document.getElementById('emptyState').style.display = v ? 'none' : (allArticles.length ? 'none' : 'flex');
+}
+
+function showResults(v) {
+  document.getElementById('results').style.display = v ? 'flex' : 'none';
+  document.getElementById('emptyState').style.display = v ? 'none' : 'flex';
+}
+
+async function runSearch() {
+  const dateFrom = document.getElementById('dateFrom').value;
+  const dateTo = document.getElementById('dateTo').value;
+  const countries = [...document.querySelectorAll('.country-toggle.active')].map(b => b.dataset.c);
+  const maxArt = parseInt(document.getElementById('maxArticles').value);
+  const apiKey = document.getElementById('apiKey').value.trim();
+
+  document.getElementById('errorBar').style.display = 'none';
+  if (!apiKey) { showError('Please enter your NewsAPI key.'); return; }
+  if (!dateFrom || !dateTo) { showError('Please select a date range.'); return; }
+  if (!countries.length) { showError('Please select at least one country.'); return; }
+
+  showResults(false);
+  showLoading(true);
+  document.getElementById('runBtn').disabled = true;
+
+  const msgs = ['Fetching articles from NewsAPI…','Filtering relevant results…','Classifying by EIT UM topics…','Analysing sentiment…'];
+  let mi = 0;
+  const lmEl = document.getElementById('loadingMsg');
+  const interval = setInterval(() => { mi = (mi+1) % msgs.length; lmEl.textContent = msgs[mi]; }, 2000);
+
+  // Map country names to NewsAPI country codes
+  const COUNTRY_CODES = {
+    'Netherlands': 'nl',
+    'Belgium': 'be',
+    'United Kingdom': 'gb',
+    'Luxembourg': null  // NewsAPI has no 'lu' code — use keyword search instead
+  };
+
+  // Keywords that signal urban mobility relevance
+  const MOBILITY_KEYWORDS = [
+    'mobility','transport','transit','bicycle','cycling','bike','scooter',
+    'electric vehicle','EV','bus','tram','metro','train','rail','pedestrian',
+    'parking','traffic','road','highway','autonomous','self-driving','carpool',
+    'logistics','delivery','freight','infrastructure','urban','city transport',
+    'low emission','congestion','MaaS','e-bike','charging','public transport',
+    'walking','cycle lane','street','vehicle','commute','mobility hub'
+  ];
+
+  // Topic keyword rules — EIT UM High Impact Topics
+  const TOPIC_RULES = [
+    { topic: 'CCAM', kw: ['autonomous','self-driving','automated','connected vehicle','cooperative','CCAM','driverless','AV '] },
+    { topic: 'Mobility Data Management', kw: ['mobility data','MaaS','real-time data','open data','digital twin','data platform','transport data','smart mobility'] },
+    { topic: 'New Mobility Services', kw: ['e-scooter','scooter','bike-sharing','car-sharing','ride-hailing','micromobility','on-demand','shared bike','shared car','rental bike'] },
+    { topic: 'Urban Vehicle Access Regulations (UVAR)', kw: ['low emission zone','LEZ','zero emission zone','ZEZ','congestion charge','access restriction','clean air zone','vehicle ban','emission zone'] },
+    { topic: 'Parking and Curb Side Management', kw: ['parking','kerb','curb','loading zone','parking fee','smart parking','park-and-ride','parking policy'] },
+    { topic: 'Mobility Planning', kw: ['mobility plan','transport plan','SUMP','urban mobility plan','transport strategy','masterplan','mobility strategy'] },
+    { topic: 'Public Space Design', kw: ['pedestrianisation','pedestrian zone','cycle lane','street design','public realm','walkability','street space','pavement','sidewalk','public space'] },
+    { topic: 'Urban Logistics', kw: ['logistics','last-mile','freight','cargo bike','delivery hub','city logistics','urban freight','van delivery','parcel'] },
+    { topic: 'Electrification of Transport and Alternative Fuels', kw: ['electric vehicle','EV','e-bus','electric bus','charging station','charging infrastructure','hydrogen','e-fuel','battery','electrification','electric car','electric truck'] },
+    { topic: 'Public Transport', kw: ['bus','tram','metro','subway','rail','train','transit','public transport','BRT','bus rapid transit','commuter rail','light rail'] },
+    { topic: 'Road Safety and Security', kw: ['accident','crash','fatality','Vision Zero','speed limit','dangerous junction','road safety','cyclist killed','pedestrian killed','collision'] },
+    { topic: 'Health and Mobility', kw: ['air quality','pollution','noise','physical activity','active travel','health','cycling health','walking health','emissions health'] }
+  ];
+
+  // Sentiment keyword rules
+  const POS_WORDS = ['launch','invest','open','expand','improve','new','boost','increase','success','award','grant','plan','initiative','milestone','growth','benefit','innovation','solution','progress','upgrade','welcome','support','fund','record','breakthrough'];
+  const NEG_WORDS = ['accident','crash','death','kill','ban','close','cut','delay','fail','problem','issue','risk','danger','protest','strike','cancel','oppose','reject','decline','accident','fatality','collision','shortage','fine','penalt'];
+
+  function classifyTopic(text) {
+    const lower = text.toLowerCase();
+    for (const rule of TOPIC_RULES) {
+      if (rule.kw.some(k => lower.includes(k.toLowerCase()))) return rule.topic;
+    }
+    return 'Mobility Planning';
+  }
+
+  function classifySentiment(text) {
+    const lower = text.toLowerCase();
+    const pos = POS_WORDS.filter(w => lower.includes(w)).length;
+    const neg = NEG_WORDS.filter(w => lower.includes(w)).length;
+    if (neg > pos) return 'negative';
+    if (pos > neg) return 'positive';
+    return 'neutral';
+  }
+
+  function isMobilityRelevant(text) {
+    const lower = text.toLowerCase();
+    return MOBILITY_KEYWORDS.some(k => lower.includes(k.toLowerCase()));
+  }
+
+  try {
+    allArticles = [];
+
+    for (const country of countries) {
+      const code = COUNTRY_CODES[country];
+      let articles = [];
+
+      if (code) {
+        // Use top-headlines endpoint with country code
+        const query = 'transport OR mobility OR cycling OR electric vehicle OR bus OR tram OR parking OR logistics';
+        const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&from=${dateFrom}&to=${dateTo}&pageSize=${maxArt * 3}&apiKey=${apiKey}&sortBy=publishedAt`;
+        const resp = await fetch(url);
+        if (!resp.ok) {
+          const err = await resp.json().catch(()=>({}));
+          throw new Error(err.message || `NewsAPI error ${resp.status}`);
+        }
+        const data = await resp.json();
+        if (data.status !== 'ok') throw new Error(data.message || 'NewsAPI returned an error.');
+        articles = (data.articles || []).filter(a => {
+          const text = (a.title || '') + ' ' + (a.description || '');
+          return isMobilityRelevant(text);
+        }).slice(0, maxArt);
+      } else {
+        // Luxembourg — search by country name keyword
+        const query = `Luxembourg transport OR mobility OR cycling OR electric bus OR parking OR logistics`;
+        const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&from=${dateFrom}&to=${dateTo}&pageSize=${maxArt * 3}&apiKey=${apiKey}&sortBy=publishedAt`;
+        const resp = await fetch(url);
+        if (!resp.ok) {
+          const err = await resp.json().catch(()=>({}));
+          throw new Error(err.message || `NewsAPI error ${resp.status}`);
+        }
+        const data = await resp.json();
+        if (data.status !== 'ok') throw new Error(data.message || 'NewsAPI returned an error.');
+        articles = (data.articles || []).filter(a => {
+          const text = (a.title || '') + ' ' + (a.description || '');
+          return isMobilityRelevant(text);
+        }).slice(0, maxArt);
+      }
+
+      articles.forEach(a => {
+        const text = (a.title || '') + ' ' + (a.description || '');
+        allArticles.push({
+          title: a.title || 'Untitled',
+          source: a.source?.name || 'Unknown',
+          url: a.url || '',
+          date: (a.publishedAt || dateFrom).slice(0, 10),
+          country: country,
+          summary: a.description || 'No summary available.',
+          sentiment: classifySentiment(text),
+          topic: classifyTopic(text)
+        });
+      });
+    }
+
+    clearInterval(interval);
+
+    if (!allArticles.length) throw new Error('No mobility articles found for this date range. Try widening the dates — NewsAPI free tier covers the last 30 days.');
+
+    topicFilter = 'all'; sentFilter = 'all';
+    showLoading(false);
+    showResults(true);
+    renderStats();
+    renderTopicFilters();
+    renderArticles();
+    renderWordCloud();
+
+  } catch(e) {
+    clearInterval(interval);
+    showLoading(false);
+    showError(e.message || 'Something went wrong. Please try again.');
+    document.getElementById('emptyState').style.display = 'flex';
+  }
+  document.getElementById('runBtn').disabled = false;
+}
+
+function showError(msg) {
+  const b = document.getElementById('errorBar');
+  b.textContent = '⚠ ' + msg;
+  b.style.display = 'block';
+}
+</script>
+</body>
+</html>
